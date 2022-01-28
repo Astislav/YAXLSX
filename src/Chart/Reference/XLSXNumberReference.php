@@ -22,15 +22,15 @@ final class XLSXNumberReference
         return new self($formula, null);
     }
 
-    public static function fromNumberCache(XLSXNumberCache $numberCache): self
-    {
-        return new self(null, $numberCache);
-    }
-
     /** @param float[] $floats */
     public static function fromNumberArray(array $floats): self
     {
         return self::fromNumberCache(new XLSXNumberCache($floats));
+    }
+
+    public static function fromNumberCache(XLSXNumberCache $numberCache): self
+    {
+        return new self(null, $numberCache);
     }
 
     public function asXml(): string

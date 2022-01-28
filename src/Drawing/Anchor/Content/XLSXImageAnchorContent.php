@@ -49,6 +49,16 @@ final class XLSXImageAnchorContent implements XLSXAnchorContent
             '</xdr:pic>';
     }
 
+    public function relationId(): int
+    {
+        return $this->relationId;
+    }
+
+    public function nameXml(): string
+    {
+        return XLSXTools::filterChars($this->name);
+    }
+
     public function fileName(): string
     {
         return $this->fileName;
@@ -57,16 +67,6 @@ final class XLSXImageAnchorContent implements XLSXAnchorContent
     public function name(): string
     {
         return $this->name;
-    }
-
-    public function nameXml(): string
-    {
-        return XLSXTools::filterChars($this->name);
-    }
-
-    public function relationId(): int
-    {
-        return $this->relationId;
     }
 
     public function relXml(): string

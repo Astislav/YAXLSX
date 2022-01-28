@@ -21,19 +21,13 @@ use ZipArchive;
 
 final class XLSXWriter
 {
+    public string $company;
+    public string $author;
+    public string $subject;
+    public string $title;
     private string $tempDir;
-
     /** @var XLSXSheet[] */
     private array $sheets;
-
-    public string $company;
-
-    public string $author;
-
-    public string $subject;
-
-    public string $title;
-
     private XLSXStyleManager $styleManager;
 
     private XLSXChartSpaceManager $chartSpaceManager;
@@ -89,6 +83,14 @@ final class XLSXWriter
         $zip->addFromString('_rels/.rels', XLSXSubFiles::relsXml());
 
         $zip->close();
+    }
+
+    /** @param string[] $contentTypes */
+    private function finalizeStyles(ZipArchive $zip, array &$contentTypes): void
+    {
+        $inZipName = 'xl/styles.xml';
+        $contentTypes[] = XLSXContentTypes::forStyles($inZipName);
+        $zip->addFromString($inZipName, $this->styleManager->asXml());
     }
 
     /** @param string[] $contentTypes */
@@ -152,14 +154,6 @@ final class XLSXWriter
             $inZipName = "xl/drawings/_rels/drawing$index.xml.rels";
             $zip->addFile($fileName, $inZipName);
         }
-    }
-
-    /** @param string[] $contentTypes */
-    private function finalizeStyles(ZipArchive $zip, array &$contentTypes): void
-    {
-        $inZipName = 'xl/styles.xml';
-        $contentTypes[] = XLSXContentTypes::forStyles($inZipName);
-        $zip->addFromString($inZipName, $this->styleManager->asXml());
     }
 
     public function temporaryDir(): string

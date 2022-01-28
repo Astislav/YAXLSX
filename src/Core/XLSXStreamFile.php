@@ -25,16 +25,6 @@ final class XLSXStreamFile
         $this->opened = false;
     }
 
-    public static function tempFile(string $directory, string $prefix): self
-    {
-        $temporaryFile = tempnam($directory, $prefix);
-        if (!$temporaryFile) {
-            throw new LogicException('Failed to create temporary file');
-        }
-
-        return new self($temporaryFile);
-    }
-
     public static function fromStringWithTempName(string $directory, string $prefix, string $fileContent): self
     {
         $file = self::tempFile($directory, $prefix);
@@ -45,9 +35,14 @@ final class XLSXStreamFile
         return $file;
     }
 
-    public function __destruct()
+    public static function tempFile(string $directory, string $prefix): self
     {
-        $this->close();
+        $temporaryFile = tempnam($directory, $prefix);
+        if (!$temporaryFile) {
+            throw new LogicException('Failed to create temporary file');
+        }
+
+        return new self($temporaryFile);
     }
 
     public function open(): void
@@ -67,6 +62,24 @@ final class XLSXStreamFile
         $this->opened = true;
     }
 
+    public function close(): void
+    {
+        if (!$this->opened) {
+            return;
+        }
+
+        $this->writeBuffer();
+
+        fclose($this->fileHandle);
+        $this->opened = false;
+    }
+
+    private function writeBuffer(): void
+    {
+        fwrite($this->fileHandle, $this->buffer);
+        $this->buffer = '';
+    }
+
     public function writeString(string $buffer): void
     {
         if (!$this->opened()) {
@@ -82,22 +95,14 @@ final class XLSXStreamFile
         $this->writeBuffer();
     }
 
-    private function writeBuffer(): void
+    public function opened(): bool
     {
-        fwrite($this->fileHandle, $this->buffer);
-        $this->buffer = '';
+        return $this->opened;
     }
 
-    public function close(): void
+    public function __destruct()
     {
-        if (!$this->opened) {
-            return;
-        }
-
-        $this->writeBuffer();
-
-        fclose($this->fileHandle);
-        $this->opened = false;
+        $this->close();
     }
 
     public function delete(): void
@@ -111,10 +116,5 @@ final class XLSXStreamFile
     public function fileName(): string
     {
         return $this->fileName;
-    }
-
-    public function opened(): bool
-    {
-        return $this->opened;
     }
 }

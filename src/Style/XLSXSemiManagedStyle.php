@@ -23,11 +23,11 @@ final class XLSXSemiManagedStyle implements XLSXHashable
     private XLSXStyle $sourceStyle;
 
     public function __construct(
-        XLSXManagedFont $managedFont,
+        XLSXManagedFont   $managedFont,
         XLSXManagedFormat $managedFormat,
         XLSXManagedBorder $managedBorder,
-        XLSXManagedFill $managedFill,
-        XLSXStyle $sourceStyle
+        XLSXManagedFill   $managedFill,
+        XLSXStyle         $sourceStyle
     ) {
         $this->managedFont = $managedFont;
         $this->managedFormat = $managedFormat;

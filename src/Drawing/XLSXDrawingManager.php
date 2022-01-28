@@ -46,6 +46,22 @@ final class XLSXDrawingManager
         return $drawing;
     }
 
+    public function newIndex(): int
+    {
+        return count($this->drawings) + 1;
+    }
+
+    /** @return array<int,string> */
+    public function saveDrawings(string $directory): array
+    {
+        $indexToFileName = [];
+        foreach ($this->drawings as $drawing) {
+            $indexToFileName[ $drawing->index() ] = $this->saveDrawing($directory, $drawing)->fileName();
+        }
+
+        return $indexToFileName;
+    }
+
     private function saveDrawing(string $directory, XLSXDrawing $drawing): XLSXStreamFile
     {
         $file = XLSXStreamFile::fromStringWithTempName(
@@ -57,6 +73,17 @@ final class XLSXDrawingManager
         $this->temporaryFiles[] = $file;
 
         return $file;
+    }
+
+    /** @return array<int,string> */
+    public function saveRelations(string $directory): array
+    {
+        $indexToFileName = [];
+        foreach ($this->drawings as $drawing) {
+            $indexToFileName[ $drawing->index() ] = $this->saveRels($directory, $drawing)->fileName();
+        }
+
+        return $indexToFileName;
     }
 
     private function saveRels(string $directory, XLSXDrawing $drawing): XLSXStreamFile
@@ -72,36 +99,9 @@ final class XLSXDrawingManager
         return $file;
     }
 
-    /** @return array<int,string> */
-    public function saveDrawings(string $directory): array
-    {
-        $indexToFileName = [];
-        foreach ($this->drawings as $drawing) {
-            $indexToFileName[ $drawing->index() ] = $this->saveDrawing($directory, $drawing)->fileName();
-        }
-
-        return $indexToFileName;
-    }
-
-    /** @return array<int,string> */
-    public function saveRelations(string $directory): array
-    {
-        $indexToFileName = [];
-        foreach ($this->drawings as $drawing) {
-            $indexToFileName[ $drawing->index() ] = $this->saveRels($directory, $drawing)->fileName();
-        }
-
-        return $indexToFileName;
-    }
-
     public function isEmpty(): bool
     {
         return count($this->drawings) === 0;
-    }
-
-    public function newIndex(): int
-    {
-        return count($this->drawings) + 1;
     }
 
     /** @return XLSXDrawing[] */

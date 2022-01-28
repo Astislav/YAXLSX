@@ -70,24 +70,24 @@ final class XLSXStyleManager implements XLSXSerializableAsXml
         return $this->fromStyle(new XLSXStyle($font, $format, XLSXDefaults::defaultBorder()));
     }
 
-    public function fromFormat(XLSXFormat $format): XLSXManagedStyle
-    {
-        return $this->fromStyle(new XLSXStyle(XLSXDefaults::defaultFont(), $format, XLSXDefaults::defaultBorder()));
-    }
-
     public function fromFormatParams(string $excelFormatString): XLSXManagedStyle
     {
         return $this->fromFormat(new XLSXFormat($excelFormatString));
     }
 
-    public function fromFont(XLSXFont $font): XLSXManagedStyle
+    public function fromFormat(XLSXFormat $format): XLSXManagedStyle
     {
-        return $this->fromStyle(new XLSXStyle($font, XLSXDefaults::generalFormat(), XLSXDefaults::defaultBorder()));
+        return $this->fromStyle(new XLSXStyle(XLSXDefaults::defaultFont(), $format, XLSXDefaults::defaultBorder()));
     }
 
     public function fromFontParams(string $name, int $size, XLSXColor $color, bool $isBold): XLSXManagedStyle
     {
         return $this->fromFont(new XLSXFont($name, $size, $color, $isBold));
+    }
+
+    public function fromFont(XLSXFont $font): XLSXManagedStyle
+    {
+        return $this->fromStyle(new XLSXStyle($font, XLSXDefaults::generalFormat(), XLSXDefaults::defaultBorder()));
     }
 
     public function asXml(): string

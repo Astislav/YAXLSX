@@ -15,6 +15,11 @@ final class XLSXContentTypes
         return self::asOverrideTag(self::SHEET_CONTENT_TYPE, $fileName);
     }
 
+    private static function asOverrideTag(string $contentType, string $fileName): string
+    {
+        return /** @lang XML */ '<Override PartName="/' . $fileName . '" ContentType="' . $contentType . '"/>';
+    }
+
     public static function forChartSpace(string $fileName): string
     {
         return self::asOverrideTag(self::CHART_SPACE_CONTENT_TYPE, $fileName);
@@ -28,10 +33,5 @@ final class XLSXContentTypes
     public static function forDrawing(string $fileName): string
     {
         return self::asOverrideTag(self::DRAWING_CONTENT_TYPE, $fileName);
-    }
-
-    private static function asOverrideTag(string $contentType, string $fileName): string
-    {
-        return /** @lang XML */ '<Override PartName="/' . $fileName . '" ContentType="' . $contentType . '"/>';
     }
 }

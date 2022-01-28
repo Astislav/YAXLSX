@@ -93,9 +93,9 @@ final class XLSXColor implements XLSXSerializableAsXml
         return new self(191, 191, 191);
     }
 
-    public function colorInt(): int
+    public function asXml(): string
     {
-        return ($this->red << 16) + ($this->green << 8) + $this->blue;
+        return sprintf('<color rgb="FF%s"/>', $this->asHexString());
     }
 
     public function asHexString(): string
@@ -105,8 +105,8 @@ final class XLSXColor implements XLSXSerializableAsXml
         return strtoupper(str_pad(dechex($color), 6, '0', STR_PAD_LEFT));
     }
 
-    public function asXml(): string
+    public function colorInt(): int
     {
-        return sprintf('<color rgb="FF%s"/>', $this->asHexString());
+        return ($this->red << 16) + ($this->green << 8) + $this->blue;
     }
 }

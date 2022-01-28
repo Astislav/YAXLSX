@@ -27,15 +27,15 @@ final class XLSXColumnSetup
         $this->setGroupLevel(0);
     }
 
-    public function setGroupLevel(int $groupLevel): void
-    {
-        Assert::that($groupLevel)->between(0, 8, 'groupLevel should be 0 and 8. Zero means default');
-        $this->groupLevel = $groupLevel;
-    }
-
     public function setWidth(float $width): void
     {
         Assert::that($width)->greaterOrEqualThan(0, 'width should be greater or equal than zero. Zero means default');
         $this->width = $width;
+    }
+
+    public function setGroupLevel(int $groupLevel): void
+    {
+        Assert::that($groupLevel)->between(0, 8, 'groupLevel should be 0 and 8. Zero means default');
+        $this->groupLevel = $groupLevel;
     }
 }

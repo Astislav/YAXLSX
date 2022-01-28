@@ -22,15 +22,15 @@ final class XLSXStringReference
         return new self($formula, null);
     }
 
-    public static function fromStringCache(XLSXStringCache $strCache): self
-    {
-        return new self(null, $strCache);
-    }
-
     /** @param string[] $strings */
     public static function fromStringsArray(array $strings): self
     {
         return self::fromStringCache(new XLSXStringCache($strings));
+    }
+
+    public static function fromStringCache(XLSXStringCache $strCache): self
+    {
+        return new self(null, $strCache);
     }
 
     public function asXml(): string

@@ -46,17 +46,9 @@ final class XLSXChartSpaceManager
         return $chartSpace;
     }
 
-    private function saveChartSpace(string $directory, XLSXChartSpace $chartSpace): XLSXStreamFile
+    public function newIndex(): int
     {
-        $file = XLSXStreamFile::fromStringWithTempName(
-            $directory,
-            'xlsx_chart_' . $chartSpace->externalIndex() . '_',
-            $chartSpace->asXml()
-        );
-
-        $this->temporaryFiles[] = $file;
-
-        return $file;
+        return count($this->chartSpaces) + 1;
     }
 
     /** @return array<int,string> */
@@ -71,14 +63,22 @@ final class XLSXChartSpaceManager
         return $indexToFileName;
     }
 
+    private function saveChartSpace(string $directory, XLSXChartSpace $chartSpace): XLSXStreamFile
+    {
+        $file = XLSXStreamFile::fromStringWithTempName(
+            $directory,
+            'xlsx_chart_' . $chartSpace->externalIndex() . '_',
+            $chartSpace->asXml()
+        );
+
+        $this->temporaryFiles[] = $file;
+
+        return $file;
+    }
+
     public function isEmpty(): bool
     {
         return count($this->chartSpaces) === 0;
-    }
-
-    public function newIndex(): int
-    {
-        return count($this->chartSpaces) + 1;
     }
 
     public function newChartSpace(): XLSXChartSpace

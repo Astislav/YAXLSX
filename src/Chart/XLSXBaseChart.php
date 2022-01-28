@@ -52,11 +52,6 @@ class XLSXBaseChart
         $this->parent = null;
     }
 
-    private function setCategories(XLSXStringReference $categories): void
-    {
-        $this->categories = $categories;
-    }
-
     public function attachToChartSpace(XLSXChartSpace $parent): void
     {
         $this->parent = $parent;
@@ -70,12 +65,12 @@ class XLSXBaseChart
 
     /** @param float[] $values */
     public function addValues(
-        string $text,
-        array $values,
-        ?XLSXColor $fillColor = null,
-        ?XLSXColor $lineColor = null,
-        ?XLSXColor $textColor = null,
-        ?XLSXColor $textBgColor = null,
+        string                 $text,
+        array                  $values,
+        ?XLSXColor             $fillColor = null,
+        ?XLSXColor             $lineColor = null,
+        ?XLSXColor             $textColor = null,
+        ?XLSXColor             $textBgColor = null,
         ?XLSXDataLabelPosition $dataLabelPosition = null
     ): self {
         $this->values[] = XLSXNumberReference::fromNumberArray($values);
@@ -91,12 +86,12 @@ class XLSXBaseChart
     }
 
     public function addValuesAsFormula(
-        string $text,
-        XLSXFormula $formula,
-        ?XLSXColor $fillColor = null,
-        ?XLSXColor $lineColor = null,
-        ?XLSXColor $textColor = null,
-        ?XLSXColor $textBgColor = null,
+        string                 $text,
+        XLSXFormula            $formula,
+        ?XLSXColor             $fillColor = null,
+        ?XLSXColor             $lineColor = null,
+        ?XLSXColor             $textColor = null,
+        ?XLSXColor             $textBgColor = null,
         ?XLSXDataLabelPosition $dataLabelPosition = null
     ): self {
         $this->values[] = XLSXNumberReference::fromReferenceFormula($formula);
@@ -120,6 +115,11 @@ class XLSXBaseChart
         return $this;
     }
 
+    private function setCategories(XLSXStringReference $categories): void
+    {
+        $this->categories = $categories;
+    }
+
     public function addCategoriesAsFormula(XLSXFormula $referenceFormula): self
     {
         $this->setCategories(XLSXStringReference::fromReferenceFormula($referenceFormula));
@@ -127,14 +127,47 @@ class XLSXBaseChart
         return $this;
     }
 
+    public function chartAsXml(): string
+    {
+        if (!$this->categories) {
+            throw new LogicException('No categories was defined for chart');
+        }
+
+        if (!$this->texts) {
+            throw new LogicException('No values was defined for chart');
+        }
+
+        $seriesXml = '';
+        foreach ($this->texts as $index => $text) {
+            $seriesXml .= $this->seriesAsXml(
+                $text,
+                $this->categories,
+                $this->values[ $index ],
+                $this->fillColors[ $index ],
+                $this->lineColors[ $index ],
+                $this->textColors[ $index ],
+                $this->textBgColors[ $index ],
+                $this->dataLabelPositions[ $index ]
+            );
+        }
+
+        return /** @lang XML */
+            '<' . $this->chartTag() . '>' .
+            $this->specificParametersXml() .
+            $seriesXml .
+            '<c:axId val="0"/>' .
+            '<c:axId val="1"/>' .
+            '</' . $this->chartTag() . '>';
+    }
+
     private function seriesAsXml(
-        ?XLSXStringReference $text = null,
-        ?XLSXStringReference $categories = null,
-        ?XLSXNumberReference $values = null,
-        ?XLSXColor $fillColor = null,
-        ?XLSXColor $lineColor = null,
-        ?XLSXColor $textColor = null,
-        ?XLSXColor $textBgColor = null,
+        ?XLSXStringReference   $text = null,
+        ?XLSXStringReference   $categories = null,
+        ?XLSXNumberReference   $values = null,
+        ?XLSXColor             $fillColor = null,
+        ?XLSXColor             $lineColor = null,
+        ?XLSXColor             $textColor = null,
+        ?XLSXColor             $textBgColor = null,
         ?XLSXDataLabelPosition $dataLabelPosition = null
     ): string {
         if (!$this->parent) {
@@ -188,46 +221,13 @@ class XLSXBaseChart
             '</c:txPr>';
     }
 
-    public function specificParametersXml(): string
-    {
-        return '';
-    }
-
     public function chartTag(): string
     {
         return 'c:UNDEFINED_CHART_TAG';
     }
 
-    public function chartAsXml(): string
+    public function specificParametersXml(): string
     {
-        if (!$this->categories) {
-            throw new LogicException('No categories was defined for chart');
-        }
-
-        if (!$this->texts) {
-            throw new LogicException('No values was defined for chart');
-        }
-
-        $seriesXml = '';
-        foreach ($this->texts as $index => $text) {
-            $seriesXml .= $this->seriesAsXml(
-                $text,
-                $this->categories,
-                $this->values[ $index ],
-                $this->fillColors[ $index ],
-                $this->lineColors[ $index ],
-                $this->textColors[ $index ],
-                $this->textBgColors[ $index ],
-                $this->dataLabelPositions[ $index ]
-            );
-        }
-
-        return /** @lang XML */
-            '<' . $this->chartTag() . '>' .
-            $this->specificParametersXml() .
-            $seriesXml .
-            '<c:axId val="0"/>' .
-            '<c:axId val="1"/>' .
-            '</' . $this->chartTag() . '>';
+        return '';
     }
 }

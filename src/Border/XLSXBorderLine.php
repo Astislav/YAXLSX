@@ -9,11 +9,9 @@ use YAXLSX\Core\XLSXSerializableAsXml;
 
 final class XLSXBorderLine implements XLSXSerializableAsXml
 {
-    private string $xmlTag;
-
     public XLSXBorderLineStyle $lineStyle;
-
     public ?XLSXColor $color;
+    private string $xmlTag;
 
     private function __construct(string $xmlTag)
     {

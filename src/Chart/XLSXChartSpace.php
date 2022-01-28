@@ -14,17 +14,12 @@ use function in_array;
 
 final class XLSXChartSpace implements XLSXSerializableAsXml
 {
+    public string $title;
+    public XLSXRectangle $bounds;
     /** @var XLSXBaseChart[] */
     private array $charts;
-
     private int $externalIndex;
-
     private int $chartSeriesCount;
-
-    public string $title;
-
-    public XLSXRectangle $bounds;
-
     private bool $majorGridlinesVisible;
 
     public function __construct()
@@ -35,6 +30,14 @@ final class XLSXChartSpace implements XLSXSerializableAsXml
         $this->chartSeriesCount = 0;
         $this->majorGridlinesVisible = true;
         $this->bounds = XLSXRectangle::fromTopLeftIdAndWidthHeight(0, 0, 5, 10);
+    }
+
+    public function newBarChart(): XLSXBarChart
+    {
+        $chart = new XLSXBarChart();
+        $this->addChart($chart);
+
+        return $chart;
     }
 
     public function addChart(XLSXBaseChart $chart): self
@@ -50,14 +53,6 @@ final class XLSXChartSpace implements XLSXSerializableAsXml
         $this->charts[] = $chart;
 
         return $this;
-    }
-
-    public function newBarChart(): XLSXBarChart
-    {
-        $chart = new XLSXBarChart();
-        $this->addChart($chart);
-
-        return $chart;
     }
 
     public function newLineChart(): XLSXLineChart
@@ -92,40 +87,6 @@ final class XLSXChartSpace implements XLSXSerializableAsXml
         return $this->externalIndex;
     }
 
-    private function titleXml(): string
-    {
-        return $this->title ?
-            /** @lang XML */
-            '<c:title>' .
-            '<c:tx>' .
-            '<c:rich>' .
-            '<a:bodyPr/>' .
-            '<a:lstStyle/>' .
-            '<a:p>' .
-            '<a:pPr>' .
-            '<a:defRPr/>' .
-            '</a:pPr>' .
-            '<a:r>' .
-            '<a:rPr lang="ru-RU"/>' .
-            '<a:t>' . XLSXTools::filterChars($this->title) . '</a:t>' .
-            '</a:r>' .
-            '</a:p>' .
-            '</c:rich>' .
-            '</c:tx>' .
-            '<c:layout/>' .
-            '</c:title>' : '';
-    }
-
-    public function isAttached(): bool
-    {
-        return $this->externalIndex !== -1;
-    }
-
-    public function isEmpty(): bool
-    {
-        return count($this->charts) === 0;
-    }
-
     public function attachToManager(XLSXChartSpaceManager $manager): XLSXChartSpace
     {
         if ($this->isAttached()) {
@@ -135,6 +96,11 @@ final class XLSXChartSpace implements XLSXSerializableAsXml
         $this->externalIndex = $manager->newIndex();
 
         return $manager->fromChartSpace($this);
+    }
+
+    public function isAttached(): bool
+    {
+        return $this->externalIndex !== -1;
     }
 
     public function asXml(): string
@@ -172,6 +138,35 @@ final class XLSXChartSpace implements XLSXSerializableAsXml
             '<c:dispBlanksAs val="gap"/>' .
             '</c:chart>' .
             '</c:chartSpace>';
+    }
+
+    public function isEmpty(): bool
+    {
+        return count($this->charts) === 0;
+    }
+
+    private function titleXml(): string
+    {
+        return $this->title ?
+            /** @lang XML */
+            '<c:title>' .
+            '<c:tx>' .
+            '<c:rich>' .
+            '<a:bodyPr/>' .
+            '<a:lstStyle/>' .
+            '<a:p>' .
+            '<a:pPr>' .
+            '<a:defRPr/>' .
+            '</a:pPr>' .
+            '<a:r>' .
+            '<a:rPr lang="ru-RU"/>' .
+            '<a:t>' . XLSXTools::filterChars($this->title) . '</a:t>' .
+            '</a:r>' .
+            '</a:p>' .
+            '</c:rich>' .
+            '</c:tx>' .
+            '<c:layout/>' .
+            '</c:title>' : '';
     }
 
     private function categoryAxis(): string

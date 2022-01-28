@@ -24,12 +24,12 @@ final class XLSXStyle
     public XLSXFill $fill;
 
     public function __construct(
-        XLSXFont $font,
-        XLSXFormat $format,
+        XLSXFont    $font,
+        XLSXFormat  $format,
         ?XLSXBorder $border = null,
-        bool $wordWrap = false,
-        bool $alignCenter = false,
-        ?XLSXFill $fill = null
+        bool        $wordWrap = false,
+        bool        $alignCenter = false,
+        ?XLSXFill   $fill = null
     ) {
         $this->font = $font;
         $this->format = $format;

@@ -48,6 +48,27 @@ class XLSXStyleManagerTest extends TestCase
         $this->assertEquals($expectedXml, $actualXml);
     }
 
+    private function expectedXml(string $formatsTag, string $fontsTag, string $stylesTag): string
+    {
+        return /** @lang XML */
+            '<?xml version="1.0" encoding="UTF-8"?>' .
+            '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' .
+            $formatsTag .
+            $fontsTag .
+            '<fills count="2">' .
+            '<fill><patternFill patternType="none"/></fill>' .
+            '<fill><patternFill patternType="gray125"/></fill>' .
+            '</fills>' .
+            '<borders count="1">' .
+            '<border><left/><right/><top/><bottom/><diagonal/></border></borders>' .
+            '<cellStyleXfs><xf fontId="0" numFmtId="0" fillId="0" borderId="0"/></cellStyleXfs>' .
+            $stylesTag .
+            '<cellStyles count="1"><cellStyle name="Обычный" xfId="0" builtinId="0"/></cellStyles>' .
+            '<dxfs count="0"/>' .
+            '<tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>' .
+            '</styleSheet>';
+    }
+
     /** @test */
     public function it_generates_valid_xml(): void
     {
@@ -84,26 +105,5 @@ class XLSXStyleManagerTest extends TestCase
         $actualXml = $manager->asXml();
 
         $this->assertEquals($expectedXml, $actualXml);
-    }
-
-    private function expectedXml(string $formatsTag, string $fontsTag, string $stylesTag): string
-    {
-        return /** @lang XML */
-            '<?xml version="1.0" encoding="UTF-8"?>' .
-            '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' .
-            $formatsTag .
-            $fontsTag .
-            '<fills count="2">' .
-            '<fill><patternFill patternType="none"/></fill>' .
-            '<fill><patternFill patternType="gray125"/></fill>' .
-            '</fills>' .
-            '<borders count="1">' .
-            '<border><left/><right/><top/><bottom/><diagonal/></border></borders>' .
-            '<cellStyleXfs><xf fontId="0" numFmtId="0" fillId="0" borderId="0"/></cellStyleXfs>' .
-            $stylesTag .
-            '<cellStyles count="1"><cellStyle name="Обычный" xfId="0" builtinId="0"/></cellStyles>' .
-            '<dxfs count="0"/>' .
-            '<tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>' .
-            '</styleSheet>';
     }
 }

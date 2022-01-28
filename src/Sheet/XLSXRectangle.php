@@ -16,7 +16,7 @@ final class XLSXRectangle
     public function __construct(
         XLSXCellCoordinates $leftTop,
         XLSXCellCoordinates $rightBottom,
-        ?XLSXSheet $sheet = null
+        ?XLSXSheet          $sheet = null
     ) {
         Assert::that($rightBottom->columnId - $leftTop->columnId)->greaterOrEqualThan(
             0,
@@ -33,25 +33,11 @@ final class XLSXRectangle
         $this->sheet = $sheet;
     }
 
-    public static function fromRowAndColIds(
-        int $leftColId,
-        int $topRowId,
-        int $rightColId,
-        int $bottomRowId,
-        ?XLSXSheet $sheet = null
-    ): self {
-        return new self(
-            new XLSXCellCoordinates($leftColId, $topRowId),
-            new XLSXCellCoordinates($rightColId, $bottomRowId),
-            $sheet
-        );
-    }
-
     public static function fromTopLeftIdAndWidthHeight(
-        int $leftColId,
-        int $topRowId,
-        int $width,
-        int $height,
+        int        $leftColId,
+        int        $topRowId,
+        int        $width,
+        int        $height,
         ?XLSXSheet $sheet = null
     ): self {
         return self::fromRowAndColIds(
@@ -59,6 +45,20 @@ final class XLSXRectangle
             $topRowId,
             $leftColId + $width - 1,
             $topRowId + $height - 1,
+            $sheet
+        );
+    }
+
+    public static function fromRowAndColIds(
+        int        $leftColId,
+        int        $topRowId,
+        int        $rightColId,
+        int        $bottomRowId,
+        ?XLSXSheet $sheet = null
+    ): self {
+        return new self(
+            new XLSXCellCoordinates($leftColId, $topRowId),
+            new XLSXCellCoordinates($rightColId, $bottomRowId),
             $sheet
         );
     }
@@ -77,26 +77,6 @@ final class XLSXRectangle
         $this->rightBottom->rowId = $bottomRowId;
 
         return $this;
-    }
-
-    public function leftTop(): XLSXCellCoordinates
-    {
-        return $this->leftTop;
-    }
-
-    public function rightBottom(): XLSXCellCoordinates
-    {
-        return $this->rightBottom;
-    }
-
-    public function rightTop(): XLSXCellCoordinates
-    {
-        return new XLSXCellCoordinates($this->rightBottom->columnId, $this->leftTop->rowId);
-    }
-
-    public function leftBottom(): XLSXCellCoordinates
-    {
-        return new XLSXCellCoordinates($this->leftTop->columnId, $this->rightBottom->rowId);
     }
 
     public function width(): int
@@ -124,6 +104,14 @@ final class XLSXRectangle
         return $this->leftTop->columnId === $this->rightBottom->columnId;
     }
 
+    public function intersectRectangle(XLSXRectangle $rectangle): bool
+    {
+        return $this->containsCell($rectangle->leftTop()) ||
+            $this->containsCell($rectangle->rightTop()) ||
+            $this->containsCell($rectangle->rightBottom()) ||
+            $this->containsCell($rectangle->leftBottom());
+    }
+
     public function containsCell(XLSXCellCoordinates $cell): bool
     {
         return ($cell->columnId - $this->leftTop->columnId >= 0) &&
@@ -132,12 +120,24 @@ final class XLSXRectangle
             ($this->rightBottom->rowId - $cell->rowId >= 0);
     }
 
-    public function intersectRectangle(XLSXRectangle $rectangle): bool
+    public function leftTop(): XLSXCellCoordinates
     {
-        return $this->containsCell($rectangle->leftTop()) ||
-            $this->containsCell($rectangle->rightTop()) ||
-            $this->containsCell($rectangle->rightBottom()) ||
-            $this->containsCell($rectangle->leftBottom());
+        return $this->leftTop;
+    }
+
+    public function rightTop(): XLSXCellCoordinates
+    {
+        return new XLSXCellCoordinates($this->rightBottom->columnId, $this->leftTop->rowId);
+    }
+
+    public function rightBottom(): XLSXCellCoordinates
+    {
+        return $this->rightBottom;
+    }
+
+    public function leftBottom(): XLSXCellCoordinates
+    {
+        return new XLSXCellCoordinates($this->leftTop->columnId, $this->rightBottom->rowId);
     }
 
     public function asExcelCellsRegion(bool $withSheetName = false): string
@@ -149,6 +149,14 @@ final class XLSXRectangle
         );
     }
 
+    private function asExcelRegion(string $leftTop, string $rightBottom, bool $withSheetName): string
+    {
+        $coords = "$leftTop:$rightBottom";
+        $sheetName = $withSheetName && $this->sheet ? "'" . $this->sheet->sheetName() . "'!" : '';
+
+        return $sheetName . $coords;
+    }
+
     public function asExcelCellsRegionFixed(bool $withSheetName = false): string
     {
         return $this->asExcelRegion(
@@ -156,13 +164,5 @@ final class XLSXRectangle
             $this->rightBottom()->asExcelCellFixed(),
             $withSheetName
         );
-    }
-
-    private function asExcelRegion(string $leftTop, string $rightBottom, bool $withSheetName): string
-    {
-        $coords = "$leftTop:$rightBottom";
-        $sheetName = $withSheetName && $this->sheet ? "'" . $this->sheet->sheetName() . "'!" : '';
-
-        return $sheetName . $coords;
     }
 }

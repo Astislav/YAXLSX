@@ -43,20 +43,6 @@ final class XLSXHashCollection implements XLSXSerializableAsXml
         return $this->initialIndex + $this->index;
     }
 
-    public function reserveAsNull(string $hash): void
-    {
-        $this->items[ $hash ] = null;
-    }
-
-    private function item(string $hash): ?XLSXHashCollectionItem
-    {
-        if (!isset($this->items[ $hash ])) {
-            return null;
-        }
-
-        return $this->items[ $hash ];
-    }
-
     public function isReservedAsNull(string $hash): bool
     {
         return $this->items[ $hash ] === null;
@@ -77,6 +63,20 @@ final class XLSXHashCollection implements XLSXSerializableAsXml
         $this->index++;
 
         return $item;
+    }
+
+    private function item(string $hash): ?XLSXHashCollectionItem
+    {
+        if (!isset($this->items[ $hash ])) {
+            return null;
+        }
+
+        return $this->items[ $hash ];
+    }
+
+    public function reserveAsNull(string $hash): void
+    {
+        $this->items[ $hash ] = null;
     }
 
     public function asXml(): string

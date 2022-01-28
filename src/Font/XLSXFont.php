@@ -19,10 +19,10 @@ final class XLSXFont implements XLSXHashable
     public XLSXColor $color;
 
     public function __construct(
-        string $name,
-        int $size,
+        string    $name,
+        int       $size,
         XLSXColor $color,
-        bool $isBold
+        bool      $isBold
     ) {
         $this->name = $name;
         $this->size = $size;
@@ -30,16 +30,16 @@ final class XLSXFont implements XLSXHashable
         $this->isBold = $isBold;
     }
 
+    public static function fromColorInt(int $color): self
+    {
+        return self::fromColor(XLSXColor::fromColorInt($color));
+    }
+
     public static function fromColor(XLSXColor $color): self
     {
         $default = XLSXDefaults::defaultFont();
 
         return new self($default->name, $default->size, $color, $default->isBold);
-    }
-
-    public static function fromColorInt(int $color): self
-    {
-        return self::fromColor(XLSXColor::fromColorInt($color));
     }
 
     public function asHash(): string

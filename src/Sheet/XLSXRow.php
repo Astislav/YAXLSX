@@ -32,27 +32,6 @@ final class XLSXRow
         $this->sheet = $sheet;
     }
 
-    private function addCellXml(string $valueXml, string $typeStr, ?XLSXManagedStyle $style = null): XLSXCellCoordinates
-    {
-        $cellCoordinates = new XLSXCellCoordinates($this->colIndex, $this->rowIndex);
-        $excelCell = $cellCoordinates->asExcelCell();
-
-        $this->xml .= "<c r=\"$excelCell\"";
-        if ($typeStr) {
-            $this->xml .= " t=\"$typeStr\"";
-        }
-
-        if ($style) {
-            $this->xml .= " s=\"{$style->index()}\"";
-        }
-
-        $this->xml .= ">$valueXml</c>";
-
-        $this->colIndex++;
-
-        return $cellCoordinates;
-    }
-
     public function addDate(DateTimeImmutable $date, ?XLSXManagedStyle $style = null): XLSXCellCoordinates
     {
         return $this->addNumber(XLSXTools::convertDateTime($date), $style);
@@ -81,6 +60,27 @@ final class XLSXRow
             'inlineStr',
             $managedStyle
         );
+    }
+
+    private function addCellXml(string $valueXml, string $typeStr, ?XLSXManagedStyle $style = null): XLSXCellCoordinates
+    {
+        $cellCoordinates = new XLSXCellCoordinates($this->colIndex, $this->rowIndex);
+        $excelCell = $cellCoordinates->asExcelCell();
+
+        $this->xml .= "<c r=\"$excelCell\"";
+        if ($typeStr) {
+            $this->xml .= " t=\"$typeStr\"";
+        }
+
+        if ($style) {
+            $this->xml .= " s=\"{$style->index()}\"";
+        }
+
+        $this->xml .= ">$valueXml</c>";
+
+        $this->colIndex++;
+
+        return $cellCoordinates;
     }
 
     public function addFormula(string $value, ?XLSXManagedStyle $style = null): XLSXCellCoordinates

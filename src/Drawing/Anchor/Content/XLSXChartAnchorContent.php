@@ -43,9 +43,9 @@ final class XLSXChartAnchorContent implements XLSXAnchorContent
             '</xdr:graphicFrame>';
     }
 
-    public function name(): string
+    public function relationId(): int
     {
-        return $this->name;
+        return $this->relationId;
     }
 
     public function nameXml(): string
@@ -53,9 +53,9 @@ final class XLSXChartAnchorContent implements XLSXAnchorContent
         return XLSXTools::filterChars($this->name);
     }
 
-    public function relationId(): int
+    public function name(): string
     {
-        return $this->relationId;
+        return $this->name;
     }
 
     public function relXml(): string

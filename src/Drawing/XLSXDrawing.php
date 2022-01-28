@@ -30,11 +30,6 @@ final class XLSXDrawing implements XLSXSerializableAsXml
         return $this->index;
     }
 
-    public function isAttached(): bool
-    {
-        return $this->index !== -1;
-    }
-
     public function attachToManager(XLSXDrawingManager $manager): XLSXDrawing
     {
         if ($this->isAttached()) {
@@ -44,6 +39,11 @@ final class XLSXDrawing implements XLSXSerializableAsXml
         $this->index = $manager->newIndex();
 
         return $manager->fromDrawing($this);
+    }
+
+    public function isAttached(): bool
+    {
+        return $this->index !== -1;
     }
 
     public function asXml(): string
@@ -76,12 +76,6 @@ final class XLSXDrawing implements XLSXSerializableAsXml
             '</Relationships>';
     }
 
-    /** * @internal Используется для тестов и внутри класса */
-    public function addTwoCellAnchor(XLSXRectangle $rectangle, XLSXAnchorContent $content): void
-    {
-        $this->anchors[] = new XLSXTwoCellAnchor($rectangle, $content);
-    }
-
     public function addChartSpace(XLSXChartSpace $chartSpace): self
     {
         if (!$chartSpace->isAttached()) {
@@ -98,5 +92,11 @@ final class XLSXDrawing implements XLSXSerializableAsXml
         $this->addTwoCellAnchor($chartSpace->bounds, $chartContent);
 
         return $this;
+    }
+
+    /** * @internal Используется для тестов и внутри класса */
+    public function addTwoCellAnchor(XLSXRectangle $rectangle, XLSXAnchorContent $content): void
+    {
+        $this->anchors[] = new XLSXTwoCellAnchor($rectangle, $content);
     }
 }

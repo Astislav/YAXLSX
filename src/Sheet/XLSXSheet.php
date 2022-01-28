@@ -67,37 +67,6 @@ final class XLSXSheet
         $this->stream->delete();
     }
 
-    /** @internal Не вызывайте метод открытия листа вручную. XLSXWriter сам вызовет его, когда нужно */
-    public function open(): void
-    {
-        if ($this->stream->opened()) {
-            return;
-        }
-
-        $this->currentRow = null;
-        $this->stream->open();
-        $this->headerWritten = false;
-    }
-
-    private function writeHeader(): void
-    {
-        if (!$this->stream->opened()) {
-            return;
-        }
-
-        $xmlHeader = /** @lang XML */
-            '<?xml version="1.0" encoding="UTF-8"?>' .
-            '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' .
-            'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' .
-            '<sheetPr><outlinePr summaryBelow="0" summaryRight="0"/></sheetPr>' .
-            '<sheetFormatPr defaultRowHeight="15" />' .
-            $this->columnsXml() .
-            '<sheetData>';
-
-        $this->stream->writeString($xmlHeader);
-        $this->headerWritten = true;
-    }
-
     /** @internal Не вызывайте метод закрытия листа вручную. XLSXWriter сам вызовет его, когда нужно */
     public function close(): void
     {
@@ -119,32 +88,23 @@ final class XLSXSheet
         $this->stream->close();
     }
 
-    public function relsXml(): string
+    private function writeHeader(): void
     {
-        if (!$this->currentDrawing) {
-            return '';
+        if (!$this->stream->opened()) {
+            return;
         }
 
-        $relsXml = /** @lang XML */
-            '<Relationship ' .
-            'Id="rId' . $this->currentDrawing->index() . '" ' .
-            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" ' .
-            'Target="../drawings/drawing' . $this->currentDrawing->index() . '.xml"/>';
+        $xmlHeader = /** @lang XML */
+            '<?xml version="1.0" encoding="UTF-8"?>' .
+            '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' .
+            'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' .
+            '<sheetPr><outlinePr summaryBelow="0" summaryRight="0"/></sheetPr>' .
+            '<sheetFormatPr defaultRowHeight="15" />' .
+            $this->columnsXml() .
+            '<sheetData>';
 
-        return /** @lang XML */
-            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' .
-            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' .
-            $relsXml .
-            '</Relationships>';
-    }
-
-    public function setupColumn(int $index, float $width): void
-    {
-        if ($this->headerWritten) {
-            throw new LogicException("You can\'t setup columns after first row is saved");
-        }
-
-        $this->columnWidths[ $index ] = $width;
+        $this->stream->writeString($xmlHeader);
+        $this->headerWritten = true;
     }
 
     private function columnsXml(): string
@@ -175,6 +135,77 @@ final class XLSXSheet
         }
 
         return $xml ? "<cols>$xml</cols>" : '';
+    }
+
+    private function writeCurrentRow(): void
+    {
+        if (!$this->currentRow) {
+            return;
+        }
+
+        $this->stream->writeString($this->currentRow->asXml());
+    }
+
+    private function drawingsXml(): string
+    {
+        return $this->currentDrawing ? '<drawing r:id="rId' . $this->currentDrawing->index() . '"/>' : '';
+    }
+
+    private function mergedCellsXml(): string
+    {
+        if (!$this->mergedRects) {
+            return '';
+        }
+
+        $rectsXml = '';
+        foreach ($this->mergedRects as $rect) {
+            $rectsXml .= '<mergeCell ref = "' . $rect->asExcelCellsRegion() . '"/>';
+        }
+
+        return /** @lang XML */
+            '<mergeCells count = "' . count($this->mergedRects) . '" >' .
+            $rectsXml .
+            '</mergeCells >';
+    }
+
+    private function dataValidationsXml(): string
+    {
+        if (!$this->dataValidationXmls) {
+            return '';
+        }
+
+        return /** @lang XML */
+            '<dataValidations count="' . count($this->dataValidationXmls) . '">' .
+            implode($this->dataValidationXmls) .
+            '</dataValidations>';
+    }
+
+    public function relsXml(): string
+    {
+        if (!$this->currentDrawing) {
+            return '';
+        }
+
+        $relsXml = /** @lang XML */
+            '<Relationship ' .
+            'Id="rId' . $this->currentDrawing->index() . '" ' .
+            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" ' .
+            'Target="../drawings/drawing' . $this->currentDrawing->index() . '.xml"/>';
+
+        return /** @lang XML */
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' .
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' .
+            $relsXml .
+            '</Relationships>';
+    }
+
+    public function setupColumn(int $index, float $width): void
+    {
+        if ($this->headerWritten) {
+            throw new LogicException("You can\'t setup columns after first row is saved");
+        }
+
+        $this->columnWidths[ $index ] = $width;
     }
 
     public function openRowGroup(): void
@@ -221,13 +252,21 @@ final class XLSXSheet
         return $this->currentRow;
     }
 
-    public function setDrawing(XLSXDrawing $drawing): void
+    /** @internal Не вызывайте метод открытия листа вручную. XLSXWriter сам вызовет его, когда нужно */
+    public function open(): void
     {
-        if ($this->currentDrawing === $drawing) {
+        if ($this->stream->opened()) {
             return;
         }
 
-        $this->currentDrawing = $drawing;
+        $this->currentRow = null;
+        $this->stream->open();
+        $this->headerWritten = false;
+    }
+
+    public function currentDrawing(): XLSXDrawing
+    {
+        return $this->currentDrawing ?: $this->newDrawing();
     }
 
     public function newDrawing(): XLSXDrawing
@@ -239,9 +278,13 @@ final class XLSXSheet
         return $drawing;
     }
 
-    public function currentDrawing(): XLSXDrawing
+    public function setDrawing(XLSXDrawing $drawing): void
     {
-        return $this->currentDrawing ?: $this->newDrawing();
+        if ($this->currentDrawing === $drawing) {
+            return;
+        }
+
+        $this->currentDrawing = $drawing;
     }
 
     public function newChartSpace(): XLSXChartSpace
@@ -252,15 +295,6 @@ final class XLSXSheet
         $drawing->addChartSpace($chartSpace);
 
         return $chartSpace;
-    }
-
-    private function writeCurrentRow(): void
-    {
-        if (!$this->currentRow) {
-            return;
-        }
-
-        $this->stream->writeString($this->currentRow->asXml());
     }
 
     public function addMergedCellRectangle(XLSXRectangle $rectangle): void
@@ -302,39 +336,5 @@ final class XLSXSheet
     public function rowCount(): int
     {
         return $this->rowCount;
-    }
-
-    private function drawingsXml(): string
-    {
-        return $this->currentDrawing ? '<drawing r:id="rId' . $this->currentDrawing->index() . '"/>' : '';
-    }
-
-    private function mergedCellsXml(): string
-    {
-        if (!$this->mergedRects) {
-            return '';
-        }
-
-        $rectsXml = '';
-        foreach ($this->mergedRects as $rect) {
-            $rectsXml .= '<mergeCell ref = "' . $rect->asExcelCellsRegion() . '"/>';
-        }
-
-        return /** @lang XML */
-            '<mergeCells count = "' . count($this->mergedRects) . '" >' .
-            $rectsXml .
-            '</mergeCells >';
-    }
-
-    private function dataValidationsXml(): string
-    {
-        if (!$this->dataValidationXmls) {
-            return '';
-        }
-
-        return /** @lang XML */
-            '<dataValidations count="' . count($this->dataValidationXmls) . '">' .
-            implode($this->dataValidationXmls) .
-            '</dataValidations>';
     }
 }
