@@ -1,0 +1,37 @@
+{
+  "name": "astislav/yet-another-xlsx",
+  "description": "Relatively fast and memory saving write-only XLSX library",
+  "version": "0.5.0",
+  "type": "library",
+
+  "require": {
+    "ext-zip": "*",
+    "ext-mbstring": "*",
+    "php": ">=7.4",
+    "beberlei/assert": "^3"
+
+  },
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Astislav Bozhevolnov",
+      "email": "astislav@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "YAXLSX\\": "src/"
+    }
+  },
+  "require-dev": {
+    "ext-zip": "*",
+    "ext-mbstring": "*",
+    "phpunit/phpunit": "9.5.13"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "YAXLSX\\": "tests/"
+    }
+  }
+}
