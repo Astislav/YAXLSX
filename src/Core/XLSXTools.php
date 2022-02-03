@@ -161,17 +161,17 @@ final class XLSXTools
      */
     public static function convertDateTime(DateTimeImmutable $dateInput): float
     {
-        $days = 0; // Number of days since epoch
         $seconds = 0; // Time expressed as fraction of 24h hours in seconds
-        $year = $month = $day = 0;
-        $hour = $min = $sec = 0;
+        $day = 0;
+        $month = 0;
+        $year = 0;
         $dateTime = $dateInput->format('Y-m-d H:i:s');
-        if (preg_match("/(\d{4})(\d{2})(\d{2})/", $dateTime, $matches)) {
-            [ $junk, $year, $month, $day ] = $matches;
+        if (preg_match("/(\d{4})\-(\d{2})\-(\d{2})/", $dateTime, $matches)) {
+            [ , $year, $month, $day ] = $matches;
         }
 
         if (preg_match("/(\d+):(\d{2}):(\d{2})/", $dateTime, $matches)) {
-            [ $junk, $hour, $min, $sec ] = $matches;
+            [ , $hour, $min, $sec ] = $matches;
             $seconds = ($hour * 60 * 60 + $min * 60 + $sec) / (24 * 60 * 60);
         }
 

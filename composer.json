@@ -1,7 +1,7 @@
 {
   "name": "astislav/yet-another-xlsx",
   "description": "Relatively fast and memory saving write-only XLSX library",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "type": "library",
   "require": {
     "ext-zip": "*",
