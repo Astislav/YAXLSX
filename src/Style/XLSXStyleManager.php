@@ -18,7 +18,6 @@ use YAXLSX\HashCollection\XLSXHashCollection;
 final class XLSXStyleManager implements XLSXSerializableAsXml
 {
     public const USER_FORMATS_INITIAL_INDEX = 165;
-    public const USER_FILLS_INITIAL_INDEX = 3;
 
     private XLSXHashCollection $styles;
 
@@ -36,6 +35,8 @@ final class XLSXStyleManager implements XLSXSerializableAsXml
 
     private XLSXManagedStyle $defaultGeneralManagedStyle;
 
+    private XLSXManagedStyle $defaultDateManagedStyle;
+
     public function __construct()
     {
         $this->styles = new XLSXHashCollection('cellXfs');
@@ -50,6 +51,7 @@ final class XLSXStyleManager implements XLSXSerializableAsXml
         $this->defaultGeneralManagedStyle = $this->fromStyle(XLSXDefaults::generalStyle());
         $this->defaultStringManagedStyle = $this->fromStyle(XLSXDefaults::stringStyle());
         $this->defaultNumberManagedStyle = $this->fromStyle(XLSXDefaults::numberStyle());
+        $this->defaultDateManagedStyle = $this->fromStyle(XLSXDefaults::dateStyle());
 
         $this->formats->shiftInitialIndexTo(self::USER_FORMATS_INITIAL_INDEX);
     }
@@ -124,5 +126,11 @@ final class XLSXStyleManager implements XLSXSerializableAsXml
     public function defaultGeneralManagedStyle(): XLSXManagedStyle
     {
         return $this->defaultGeneralManagedStyle;
+    }
+
+
+    public function defaultDateManagedStyle(): XLSXManagedStyle
+    {
+        return $this->defaultDateManagedStyle;
     }
 }

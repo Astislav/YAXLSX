@@ -55,4 +55,14 @@ final class XLSXDefaults
     {
         return new XLSXFormat('#,##0.00');
     }
+
+    public static function dateStyle():XLSXStyle
+    {
+        return new XLSXStyle(self::defaultFont(), self::dateFormat(), self::defaultBorder(), false);
+    }
+
+    public static function dateFormat(): XLSXFormat
+    {
+        return new XLSXFormat('dd.MM.yyyy HH:mm:ss');
+    }
 }

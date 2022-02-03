@@ -33,9 +33,9 @@ class XLSXRowTest extends TestCase
             '<row r="1">' .
             '<c r="A1" t="n" s="2"><v>239.239</v></c>' .
             '<c r="B1" t="n" s="2"><v>239.239</v></c>' .
-            '<c r="C1" t="inlineStr" s="3"><is><t>Какая-нибудь строка с кастомным стилем</t></is></c>' .
+            '<c r="C1" t="inlineStr" s="4"><is><t>Какая-нибудь строка с кастомным стилем</t></is></c>' .
             '<c r="D1" t="inlineStr" s="1"><is><t>Какая-нибудь строка текстовая по-умолчанию</t></is></c>' .
-            '<c r="E1" s="3"><f>A1+B1/2</f></c>' .
+            '<c r="E1" s="4"><f>A1+B1/2</f></c>' .
             '<c r="F1" s="0"><f>A1-B1/2</f></c>' .
             '</row>';
         $this->assertEquals($expectedXml, $row->asXml());

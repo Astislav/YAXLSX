@@ -26,7 +26,6 @@ final class XLSXRow
     {
         $this->rowIndex = $sheet->rowCount();
         $this->colIndex = 0;
-        $this->groupLevel = 0;
         $this->xml = '';
         $this->groupLevel = 0;
         $this->sheet = $sheet;
@@ -34,7 +33,9 @@ final class XLSXRow
 
     public function addDate(DateTimeImmutable $date, ?XLSXManagedStyle $style = null): XLSXCellCoordinates
     {
-        return $this->addNumber(XLSXTools::convertDateTime($date), $style);
+        $managedStyle = $style ?: $this->sheet->writer()->styleManager()->defaultDateManagedStyle();
+
+        return $this->addNumber(XLSXTools::convertDateTime($date), $managedStyle);
     }
 
     public function addNumber(float $value, ?XLSXManagedStyle $style = null): XLSXCellCoordinates

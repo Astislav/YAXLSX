@@ -24,22 +24,27 @@ class XLSXStyleManagerTest extends TestCase
     private const DEFAULT_NUMBER_XF = /** @lang XML */
         '<xf xfId="2" fontId="0" numFmtId="2" fillId="0" borderId="0" applyNumberFormat="1"></xf>';
 
+    private const DEFAULT_DATE_XF = /** @lang XML */
+        '<xf xfId="3" fontId="0" numFmtId="3" fillId="0" borderId="0" applyNumberFormat="1"></xf>';
+
     /** @test */
     public function its_valid_by_default(): void
     {
         $manager = new XLSXStyleManager();
 
-        $expectedFormatsTag = '<numFmts count="3">' .
+        $expectedFormatsTag = '<numFmts count="4">' .
             XLSXDefaults::generalFormat()->asXml(0) .
             XLSXDefaults::stringFormat()->asXml(1) .
             XLSXDefaults::numberFormat()->asXml(2) .
+            XLSXDefaults::dateFormat()->asXml(3) .
             '</numFmts>';
 
         $expectedFontsTag = '<fonts count="1">' . XLSXDefaults::defaultFont()->asXml(0) . '</fonts>';
-        $expectedStylesTag = '<cellXfs count="3">' .
+        $expectedStylesTag = '<cellXfs count="4">' .
             self::DEFAULT_GENERAL_XF .
             self::DEFAULT_STRING_XF .
             self::DEFAULT_NUMBER_XF .
+            self::DEFAULT_DATE_XF .
             '</cellXfs>';
 
         $expectedXml = $this->expectedXml($expectedFormatsTag, $expectedFontsTag, $expectedStylesTag);
@@ -80,10 +85,11 @@ class XLSXStyleManagerTest extends TestCase
         $manager->fromStyle($style);
 
         $expectedFormatsTag = /** @lang XML */
-            '<numFmts count="4">' .
+            '<numFmts count="5">' .
             XLSXDefaults::generalFormat()->asXml(0) .
             XLSXDefaults::stringFormat()->asXml(1) .
             XLSXDefaults::numberFormat()->asXml(2) .
+            XLSXDefaults::dateFormat()->asXml(3) .
             $format->asXml($manager::USER_FORMATS_INITIAL_INDEX) .
             '</numFmts>';
 
@@ -94,11 +100,12 @@ class XLSXStyleManagerTest extends TestCase
             '</fonts>';
 
         $expectedStylesTag = /** @lang XML */
-            '<cellXfs count="4">' .
+            '<cellXfs count="5">' .
             self::DEFAULT_GENERAL_XF .
             self::DEFAULT_STRING_XF .
             self::DEFAULT_NUMBER_XF .
-            '<xf xfId="3" fontId="1" numFmtId="165" fillId="0" borderId="0" applyNumberFormat="1" applyFont="1"></xf>' .
+            self::DEFAULT_DATE_XF .
+            '<xf xfId="4" fontId="1" numFmtId="165" fillId="0" borderId="0" applyNumberFormat="1" applyFont="1"></xf>' .
             '</cellXfs>';
 
         $expectedXml = $this->expectedXml($expectedFormatsTag, $expectedFontsTag, $expectedStylesTag);

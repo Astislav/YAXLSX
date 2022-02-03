@@ -36,10 +36,10 @@ final class XLSXWriter
 
     public function __construct(string $tempDir)
     {
-        $this->company = 'Гермес';
-        $this->author = 'Гермес';
-        $this->subject = 'Гермес';
-        $this->title = 'Гермес';
+        $this->company = 'Company';
+        $this->author = 'Author';
+        $this->subject = 'Subject';
+        $this->title = 'Title';
         $this->tempDir = $tempDir;
 
         $this->styleManager = new XLSXStyleManager();
