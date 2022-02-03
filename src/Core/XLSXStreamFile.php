@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace YAXLSX\Core;
 
 
+use LogicException;
+
 final class XLSXStreamFile
 {
     /** @var resource */
@@ -37,7 +39,7 @@ final class XLSXStreamFile
 
     public static function tempFile(string $directory, string $prefix): self
     {
-        $temporaryFile = tempnam($directory, $prefix);
+        $temporaryFile = @tempnam($directory, $prefix);
         if (!$temporaryFile) {
             throw new LogicException('Failed to create temporary file');
         }

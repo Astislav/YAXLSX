@@ -23,8 +23,6 @@
     }
   },
   "require-dev": {
-    "ext-zip": "*",
-    "ext-mbstring": "*",
     "phpunit/phpunit": "9.5.13"
   },
   "autoload-dev": {
